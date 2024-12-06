@@ -157,20 +157,17 @@ module.exports = {
           )
         );
       }
+      await findInquiry.updateOne({ status: status.RESOLVE });
 
-      if (findInquiry.status === status.PENDING) {
-        await findInquiry.updateOne({ status: status.RESOLVE });
-
-        logger.info(`Inquiry ${messages.RESOLVED_SUCCESSFULLY}`);
-        return res.json(
-          HandleResponse(
-            response.SUCCESS,
-            StatusCodes.ACCEPTED,
-            messages.RESOLVED_SUCCESSFULLY,
-            undefined
-          )
-        );
-      }
+      logger.info(`Inquiry ${messages.RESOLVED_SUCCESSFULLY}`);
+      return res.json(
+        HandleResponse(
+          response.SUCCESS,
+          StatusCodes.ACCEPTED,
+          messages.RESOLVED_SUCCESSFULLY,
+          undefined
+        )
+      );
     } catch (error) {
       logger.error(error.message || error);
       return res.json(
