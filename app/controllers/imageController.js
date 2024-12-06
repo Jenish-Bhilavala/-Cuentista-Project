@@ -1,7 +1,6 @@
 const { StatusCodes } = require('http-status-codes');
 const HandleResponse = require('../services/errorHandler');
 const { response } = require('../utils/enum');
-const message = require('../utils/message');
 
 module.exports = {
   uploadFile: (req, res) => {

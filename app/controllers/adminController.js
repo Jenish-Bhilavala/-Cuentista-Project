@@ -162,8 +162,7 @@ module.exports = {
 
   changePassword: async (req, res) => {
     try {
-      const { email, current_password, new_password, confirm_password } =
-        req.body;
+      const { email, current_password, new_password } = req.body;
       const { error } = changePassword.validate(req.body);
 
       if (error) {
@@ -236,7 +235,7 @@ module.exports = {
 
   forgotPassword: async (req, res) => {
     try {
-      const { email, otp, new_password, confirm_password } = req.body;
+      const { email, otp, new_password } = req.body;
       const { error } = forgotPassword.validate(req.body);
 
       if (error) {
