@@ -6,5 +6,5 @@ module.exports = {
   NOT_FOUND: 'not found.',
   RETRIEVED_SUCCESSFULLY: 'retrieved successfully.',
   ALREADY_RESOLVED: 'Inquiry is already resolve.',
-  RESOLVED_SUCCESSFULLY: 'Inquiry resolved successfully.',
+  RESOLVED_SUCCESSFULLY: 'Inquiry status update successfully.',
 };
