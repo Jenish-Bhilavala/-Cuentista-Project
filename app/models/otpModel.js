@@ -27,7 +27,7 @@ const optSchema = new mongoose.Schema(
   }
 );
 
-optSchema.index({ expireAt: 1 }, { expireAfterSeconds: 0 });
+optSchema.index({ expire_at: 1 }, { expireAfterSeconds: 0 });
 
 const otpModel = mongoose.model('otp', optSchema);
 module.exports = otpModel;
