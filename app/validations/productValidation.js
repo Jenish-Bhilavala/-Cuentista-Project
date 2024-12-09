@@ -11,7 +11,7 @@ const productValidation = Joi.object({
     'string.empty': 'Product description cannot ne empty.',
     'any.required': 'Product name is a required field.',
   }),
-  image: Joi.object().required().messages({
+  images: Joi.object().required().messages({
     'object.base': 'Image is a required field.',
   }),
   contact: Joi.string().required().messages({
@@ -19,4 +19,10 @@ const productValidation = Joi.object({
     'string.empty': 'Contact cannot be empty.',
     'any.required': 'Contact is a required field.',
   }),
+  expertise: Joi.array().optional(),
+  methodology: Joi.array().optional(),
+  product_service: Joi.array().optional(),
+  productBenefit: Joi.array().optional(),
 });
+
+module.exports = { productValidation };

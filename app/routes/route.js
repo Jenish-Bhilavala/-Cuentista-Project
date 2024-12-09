@@ -9,6 +9,6 @@ const productRoute = require('../routes/routers/productRoute');
 router.use('/api/inquiry', inquiryRoute);
 router.use('/api/admin', adminRoute);
 router.use('/api/image-upload', imageRoute);
-// router.use('/api/product', productRoute);
+router.use('/api/product', productRoute);
 
 module.exports = router;
