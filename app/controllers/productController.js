@@ -148,6 +148,7 @@ module.exports = {
       );
     }
   },
+
   listOfProduct: async (req, res) => {
     try {
       const { page, limit, sortBy, orderBy, searchTerm } = req.body;
