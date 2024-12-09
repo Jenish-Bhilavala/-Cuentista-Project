@@ -39,6 +39,7 @@ const productSchema = new mongoose.Schema(
       {
         benefit_description: {
           type: String,
+          default: null,
           maxLength: 255,
         },
       },
@@ -47,12 +48,14 @@ const productSchema = new mongoose.Schema(
       {
         service_type: {
           type: String,
+          default: null,
           maxLength: 50,
         },
         service_details: [
           {
             service_detail: {
               type: String,
+              default: null,
               maxLength: 255,
             },
           },
@@ -63,6 +66,7 @@ const productSchema = new mongoose.Schema(
       {
         methodology_steps: {
           type: String,
+          default: null,
           maxLength: 50,
         },
       },
@@ -71,10 +75,12 @@ const productSchema = new mongoose.Schema(
       {
         area: {
           type: String,
+          default: null,
           maxLength: 50,
         },
         description: {
           type: String,
+          default: null,
           maxLength: 255,
         },
       },

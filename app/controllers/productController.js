@@ -4,7 +4,10 @@ const HandleResponse = require('../services/errorHandler');
 const { StatusCodes } = require('http-status-codes');
 const { response } = require('../utils/enum');
 const { logger } = require('../logger/logger');
-const { productValidation } = require('../validations/productValidation');
+const {
+  productValidation,
+  updateProduct,
+} = require('../validations/productValidation');
 
 module.exports = {
   addProduct: async (req, res) => {
@@ -33,7 +36,7 @@ module.exports = {
         );
       }
 
-      const findProduct = await Product.findOne({ product_name });
+      const findProduct = await productModel.findOne({ product_name });
 
       if (findProduct) {
         logger.error(`Product ${message.ALREADY_EXISTS}`);
@@ -47,7 +50,7 @@ module.exports = {
         );
       }
 
-      const newProduct = new Product({
+      const newProduct = new productModel({
         contact,
         expertise,
         methodology,
@@ -113,6 +116,38 @@ module.exports = {
     }
   },
 
+  getProductList: async (req, res) => {
+    try {
+      const listProduct = await productModel.find().select('_id, product_name');
+
+      if (!listProduct) {
+        logger.error(`Product ${message.NOT_FOUND}`);
+        return res.json(
+          HandleResponse(
+            response.ERROR,
+            StatusCodes.NOT_FOUND,
+            `Product ${message.NOT_FOUND}`,
+            undefined
+          )
+        );
+      }
+
+      logger.info(`Product ${message.RESOLVED_SUCCESSFULLY}`);
+      return res.json(
+        HandleResponse(response.SUCCESS, StatusCodes.OK, undefined, listProduct)
+      );
+    } catch (error) {
+      logger.error(error.message || error);
+      return res.json(
+        HandleResponse(
+          response.ERROR,
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          error.message || error,
+          undefined
+        )
+      );
+    }
+  },
   listOfProduct: async (req, res) => {
     try {
       const { page, limit, sortBy, orderBy, searchTerm } = req.body;
@@ -164,6 +199,101 @@ module.exports = {
           totalPage: count / limit,
           pageSize: limit,
         })
+      );
+    } catch (error) {
+      logger.error(error.message || error);
+      return res.json(
+        HandleResponse(
+          response.ERROR,
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          error.message || error,
+          undefined
+        )
+      );
+    }
+  },
+
+  updateProduct: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const productData = req.body;
+      const { error } = updateProduct.validate(productData);
+
+      if (error) {
+        logger.error(error.details[0].message);
+        return res.json(
+          HandleResponse(
+            response.ERROR,
+            StatusCodes.BAD_REQUEST,
+            error.details[0].message,
+            undefined
+          )
+        );
+      }
+
+      const findProduct = await productModel.findById(id);
+
+      if (!findProduct) {
+        logger.error(`Product ${message.NOT_FOUND}`);
+        return res.json(
+          HandleResponse(
+            response.ERROR,
+            StatusCodes.NOT_FOUND,
+            `Product ${message.NOT_FOUND}`,
+            undefined
+          )
+        );
+      }
+
+      await productModel.updateOne({ _id: id }, { $set: productData });
+
+      logger.info(`Product ${message.UPDATED_SUCCESSFULLY}`);
+      return res.json(
+        HandleResponse(
+          response.SUCCESS,
+          StatusCodes.ACCEPTED,
+          `Profile ${message.UPDATED_SUCCESSFULLY}`,
+          undefined
+        )
+      );
+    } catch (error) {
+      logger.error(error.message || error);
+      return res.json(
+        HandleResponse(
+          response.ERROR,
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          error.message || error,
+          undefined
+        )
+      );
+    }
+  },
+
+  deleteProduct: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const findProduct = await productModel.findByIdAndDelete(id);
+
+      if (!findProduct) {
+        logger.error(`Product ${message.NOT_FOUND}`);
+        return res.json(
+          HandleResponse(
+            response.ERROR,
+            StatusCodes.NOT_FOUND,
+            `Product ${message.NOT_FOUND}`,
+            undefined
+          )
+        );
+      }
+
+      logger.info(`Product ${message.DELETE_SUCCESSFULLY}`);
+      return res.json(
+        HandleResponse(
+          response.SUCCESS,
+          StatusCodes.OK,
+          `Product ${message.DELETE_SUCCESSFULLY}`,
+          undefined
+        )
       );
     } catch (error) {
       logger.error(error.message || error);
