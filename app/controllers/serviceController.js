@@ -67,8 +67,8 @@ module.exports = {
         HandleResponse(
           response.SUCCESS,
           StatusCodes.CREATED,
-          { id: savedService._id },
-          undefined
+          `Service ${message.ADDED_SUCCESSFULLY}`,
+          { id: savedService._id }
         )
       );
     } catch (error) {
@@ -126,7 +126,7 @@ module.exports = {
         .find()
         .select('_id, service_name');
 
-      if (!getServiceList) {
+      if (getServiceList.length === 0) {
         logger.error(`Service ${message.NOT_FOUND}`);
         return res.json(
           HandleResponse(
@@ -271,7 +271,7 @@ module.exports = {
   deleteService: async (req, res) => {
     try {
       const { id } = req.params;
-      const findService = await serviceModel.findById(id);
+      const findService = await serviceModel.findByIdAndDelete(id);
 
       if (!findService) {
         logger.error(`Service ${message.NOT_FOUND}`);
@@ -284,8 +284,6 @@ module.exports = {
           )
         );
       }
-
-      await serviceModel.deleteOne(findService);
 
       logger.info(`Service ${message.DELETE_SUCCESSFULLY}`);
       return res.json(
