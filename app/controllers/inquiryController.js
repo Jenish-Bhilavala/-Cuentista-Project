@@ -85,7 +85,6 @@ module.exports = {
 
       const inquiryData = await inquiryModel.aggregate(pipeline);
       const count = inquiryData.length || 0;
-      console.log(count);
 
       pipeline.push(
         { $skip: (pageNumber - 1) * limitNumber },
