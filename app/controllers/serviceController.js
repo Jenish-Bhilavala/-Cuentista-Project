@@ -230,6 +230,18 @@ module.exports = {
       const { id } = req.params;
       const serviceData = req.body;
       const { error } = updateService.validate(serviceData);
+
+      if (error) {
+        logger.error(error.details[0].message);
+        return res.json(
+          HandleResponse(
+            response.ERROR,
+            StatusCodes.BAD_REQUEST,
+            error.details[0].message,
+            undefined
+          )
+        );
+      }
       const findService = await serviceModel.findById(id);
 
       if (!findService) {

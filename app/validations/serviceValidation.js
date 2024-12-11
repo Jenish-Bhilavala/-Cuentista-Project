@@ -41,7 +41,7 @@ const updateService = Joi.object({
     'string.base': 'Service description must be a string.',
     'string.empty': 'Service description cannot be empty.',
   }),
-  images: Joi.object().required().messages({
+  images: Joi.object().optional().messages({
     'object.base': 'Images are required field.',
   }),
   sub_service: Joi.array().optional().messages({
