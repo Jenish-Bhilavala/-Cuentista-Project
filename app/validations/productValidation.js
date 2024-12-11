@@ -45,7 +45,6 @@ const updateProduct = Joi.object({
   }),
   images: Joi.object().optional().messages({
     'object.base': 'Image must be a string.',
-    'object.required': 'Images are required fields.',
   }),
   contact: Joi.string().optional().messages({
     'string.base': 'Contact must be a string.',
