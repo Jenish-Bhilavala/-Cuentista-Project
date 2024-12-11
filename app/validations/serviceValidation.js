@@ -44,11 +44,21 @@ const updateService = Joi.object({
   images: Joi.object().required().messages({
     'object.base': 'Images are required field.',
   }),
-  sub_service: Joi.array().optional(),
-  service_approach: Joi.array().optional(),
-  service_atc: Joi.array().optional(),
-  service_benefit: Joi.array().optional(),
-  service_consulting: Joi.array().optional(),
+  sub_service: Joi.array().optional().messages({
+    'array.base': 'Sub services must be an array',
+  }),
+  service_approach: Joi.array().optional().messages({
+    'array.base': 'Services approach must be an array',
+  }),
+  service_atc: Joi.array().optional().messages({
+    'array.base': 'Service ATC must be an array',
+  }),
+  service_benefit: Joi.array().optional().messages({
+    'array.base': 'Service benefit must be an array',
+  }),
+  service_consulting: Joi.array().optional().messages({
+    'array.base': 'Service consulting must be an array',
+  }),
 });
 
 module.exports = { serviceValidation, updateService };
