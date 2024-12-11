@@ -35,7 +35,7 @@ const productSchema = new mongoose.Schema(
       required: true,
       maxLength: 255,
     },
-    productBenefit: [
+    product_benefit: [
       {
         benefit_description: {
           type: String,

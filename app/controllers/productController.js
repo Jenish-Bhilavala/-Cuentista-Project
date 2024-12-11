@@ -20,7 +20,7 @@ module.exports = {
         images,
         product_name,
         product_service,
-        productBenefit,
+        product_benefit,
       } = req.body;
       const { error } = productValidation.validate(req.body);
 
@@ -58,16 +58,21 @@ module.exports = {
         images,
         product_name,
         product_service,
-        productBenefit,
+        product_benefit,
       });
 
       const savedProduct = await newProduct.save();
 
       logger.info(`Product ${message.ADDED_SUCCESSFULLY}`);
       return res.json(
-        HandleResponse(response.SUCCESS, StatusCodes.CREATED, undefined, {
-          _id: savedProduct._id,
-        })
+        HandleResponse(
+          response.SUCCESS,
+          StatusCodes.CREATED,
+          `Product ${message.ADDED_SUCCESSFULLY}`,
+          {
+            _id: savedProduct._id,
+          }
+        )
       );
     } catch (error) {
       logger.error(error.message || error);
@@ -120,7 +125,7 @@ module.exports = {
     try {
       const listProduct = await productModel.find().select('_id, product_name');
 
-      if (!listProduct) {
+      if (listProduct.length === 0) {
         logger.error(`Product ${message.NOT_FOUND}`);
         return res.json(
           HandleResponse(

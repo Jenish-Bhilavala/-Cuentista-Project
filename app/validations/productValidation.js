@@ -12,17 +12,26 @@ const productValidation = Joi.object({
     'any.required': 'Product name is a required field.',
   }),
   images: Joi.object().required().messages({
-    'object.base': 'Image is a required field.',
+    'object.base': 'Image must be a string.',
+    'object.required': 'Image is a required field.',
   }),
   contact: Joi.string().required().messages({
     'string.base': 'Contact must be a string.',
     'string.empty': 'Contact cannot be empty.',
     'any.required': 'Contact is a required field.',
   }),
-  expertise: Joi.array().optional(),
-  methodology: Joi.array().optional(),
-  product_service: Joi.array().optional(),
-  productBenefit: Joi.array().optional(),
+  expertise: Joi.array().optional().messages({
+    'array.base': 'Expertise must be an array.',
+  }),
+  methodology: Joi.array().optional().messages({
+    'array.base': 'Expertise must be an array.',
+  }),
+  product_service: Joi.array().optional().messages({
+    'array.base': 'Expertise must be an array.',
+  }),
+  product_benefit: Joi.array().optional().messages({
+    'array.base': 'Expertise must be an array.',
+  }),
 });
 
 const updateProduct = Joi.object({
@@ -35,16 +44,25 @@ const updateProduct = Joi.object({
     'string.empty': 'Product description cannot ne empty.',
   }),
   images: Joi.object().optional().messages({
-    'object.base': 'Image is a required field.',
+    'object.base': 'Image must be a string.',
+    'object.required': 'Images are required fields.',
   }),
   contact: Joi.string().optional().messages({
     'string.base': 'Contact must be a string.',
     'string.empty': 'Contact cannot be empty.',
   }),
-  expertise: Joi.array().optional(),
-  methodology: Joi.array().optional(),
-  product_service: Joi.array().optional(),
-  productBenefit: Joi.array().optional(),
+  expertise: Joi.array().optional().messages({
+    'array.base': 'Expertise must be an array.',
+  }),
+  methodology: Joi.array().optional().messages({
+    'array.base': 'Expertise must be an array.',
+  }),
+  product_service: Joi.array().optional().messages({
+    'array.base': 'Expertise must be an array.',
+  }),
+  product_benefit: Joi.array().optional().messages({
+    'array.base': 'Expertise must be an array.',
+  }),
 });
 
 module.exports = { productValidation, updateProduct };
