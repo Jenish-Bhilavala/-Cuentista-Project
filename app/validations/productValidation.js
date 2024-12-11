@@ -24,13 +24,13 @@ const productValidation = Joi.object({
     'array.base': 'Expertise must be an array.',
   }),
   methodology: Joi.array().optional().messages({
-    'array.base': 'Expertise must be an array.',
+    'array.base': 'Methodology must be an array.',
   }),
   product_service: Joi.array().optional().messages({
-    'array.base': 'Expertise must be an array.',
+    'array.base': 'Product service must be an array.',
   }),
   product_benefit: Joi.array().optional().messages({
-    'array.base': 'Expertise must be an array.',
+    'array.base': 'Product benefit must be an array.',
   }),
 });
 
@@ -55,13 +55,13 @@ const updateProduct = Joi.object({
     'array.base': 'Expertise must be an array.',
   }),
   methodology: Joi.array().optional().messages({
-    'array.base': 'Expertise must be an array.',
+    'array.base': 'Methodology must be an array.',
   }),
   product_service: Joi.array().optional().messages({
-    'array.base': 'Expertise must be an array.',
+    'array.base': 'Product service must be an array.',
   }),
   product_benefit: Joi.array().optional().messages({
-    'array.base': 'Expertise must be an array.',
+    'array.base': 'Product benefit must be an array.',
   }),
 });
 
