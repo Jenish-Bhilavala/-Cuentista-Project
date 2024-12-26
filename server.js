@@ -6,7 +6,10 @@ require('dotenv').config();
 
 const cors = require('cors');
 app.use(cors());
-connectDB();
+
+if (process.env.NODE_ENV !== 'test') {
+  connectDB(); // Only connect to DB if not in test environment
+}
 
 app.use(express.static(path.join(__dirname, 'app', 'public')));
 
@@ -15,5 +18,10 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 app.use('/', require('./app/routes/route.js'));
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server is listening on port ${PORT}`));
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(8000, () => {
+    console.log('Server is running on port 8000');
+  });
+}
+
+module.exports = app;

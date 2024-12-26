@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha app/Test/controllers/**/*.test.js",
     "format": "prettier --write ."
   },
   "keywords": [],
@@ -25,5 +25,12 @@
     "nodemailer": "^6.9.16",
     "npm": "^10.9.2",
     "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^11.0.1",
+    "mongodb-memory-server": "^10.1.2",
+    "sinon": "^19.0.2",
+    "supertest": "^7.0.0"
   }
 }
