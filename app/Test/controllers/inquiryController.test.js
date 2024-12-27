@@ -8,8 +8,11 @@ const message = require('../../utils/message');
 const { response } = require('../../utils/enum');
 const {
   pagination,
-  invalidInquiryData,
+  emptyInquiryData,
   validInquiryData,
+  fieldRequiredInquiryData,
+  invalidEmailInquiryData,
+  invalidPhoneInquiryData,
 } = require('../data/inquiryData');
 const app = require('../../../server');
 const expect = chai.expect;
@@ -37,12 +40,45 @@ describe('Inquiry controller', function () {
     it('should return validation error if any field is empty', async () => {
       const res = await supertest(app)
         .post('/api/inquiry/create-inquiry')
-        .send(invalidInquiryData)
+        .send(emptyInquiryData)
         .expect(StatusCodes.OK);
 
       expect(res.body.status).to.equal(response.ERROR);
       expect(res.body.statusCode).to.equal(StatusCodes.BAD_REQUEST);
       expect(res.body.message).to.equal('First name cannot be empty.');
+    });
+
+    it('should return error of first name is required.', async () => {
+      const res = await supertest(app)
+        .post('/api/inquiry/create-inquiry')
+        .send(fieldRequiredInquiryData)
+        .expect(StatusCodes.OK);
+
+      expect(res.body.status).to.equal(response.ERROR);
+      expect(res.body.statusCode).to.equal(StatusCodes.BAD_REQUEST);
+      expect(res.body.message).to.equal(`First name is a required field.`);
+    });
+
+    it('should return error if email is invalid', async () => {
+      const res = await supertest(app)
+        .post('/api/inquiry/create-inquiry')
+        .send(invalidEmailInquiryData)
+        .expect(StatusCodes.OK);
+
+      expect(res.body.status).to.equal(response.ERROR);
+      expect(res.body.statusCode).to.equal(StatusCodes.BAD_REQUEST);
+      expect(res.body.message).to.equal('Email must be a valid email address.');
+    });
+
+    it('should return error if phone is not valid', async () => {
+      const res = await supertest(app)
+        .post('/api/inquiry/create-inquiry')
+        .send(invalidPhoneInquiryData)
+        .expect(StatusCodes.OK);
+
+      expect(res.body.status).to.equal(response.ERROR);
+      expect(res.body.statusCode).to.equal(StatusCodes.BAD_REQUEST);
+      expect(res.body.message).to.equal('Phone must be exactly 10 digits.');
     });
 
     it('should create a new inquiry successfully', async () => {
