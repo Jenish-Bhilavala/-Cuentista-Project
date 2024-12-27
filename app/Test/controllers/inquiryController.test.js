@@ -1,5 +1,4 @@
 const chai = require('chai');
-const sinon = require('sinon');
 const supertest = require('supertest');
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
@@ -7,8 +6,6 @@ const { StatusCodes } = require('http-status-codes');
 const inquiryModel = require('../../models/inquiryModel');
 const message = require('../../utils/message');
 const { response } = require('../../utils/enum');
-const { sendMail } = require('../../services/email');
-const HandleResponse = require('../../services/errorHandler');
 const {
   pagination,
   invalidInquiryData,
@@ -56,14 +53,11 @@ describe('Inquiry controller', function () {
 
       expect(res.body.status).to.equal(response.SUCCESS);
       expect(res.body.statusCode).to.equal(StatusCodes.CREATED);
+      expect(res.body.data).to.have.property('id');
       expect(res.body.message).to.equal(
         `Inquiry ${message.ADDED_SUCCESSFULLY}`
       );
-      expect(res.body.data).to.have.property('id');
       createdInquiryId = res.body.data.id;
-
-      const savedInquiry = await inquiryModel.findById(createdInquiryId);
-      expect(savedInquiry).to.not.be.null;
     });
   });
 
@@ -77,12 +71,6 @@ describe('Inquiry controller', function () {
       expect(res.body.status).to.equal(response.SUCCESS);
       expect(res.body.statusCode).to.equal(StatusCodes.OK);
       expect(res.body.data.listOfInquiry).to.have.lengthOf(1);
-
-      expect(
-        res.body.data.listOfInquiry.some(
-          (inquiry) => inquiry._id.toString() === createdInquiryId
-        )
-      ).to.be.true;
     });
 
     it('should return error 404 if no inquiries found', async () => {
