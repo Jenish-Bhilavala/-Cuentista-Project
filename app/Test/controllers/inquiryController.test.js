@@ -1,7 +1,6 @@
 const chai = require('chai');
 const supertest = require('supertest');
 const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
 const { StatusCodes } = require('http-status-codes');
 const inquiryModel = require('../../models/inquiryModel');
 const message = require('../../utils/message');
@@ -17,21 +16,24 @@ const {
 const app = require('../../../server');
 const expect = chai.expect;
 
-let mongoServer;
-before(async () => {
-  mongoServer = await MongoMemoryServer.create();
-  const uri = mongoServer.getUri();
-  const testDbUri = `${uri}cuentistaTest`;
-  await mongoose.connect(testDbUri);
-});
-
-after(function () {
-  mongoose.connection.dropDatabase();
-  mongoose.connection.close();
-  mongoServer.stop();
-});
-
 let createdInquiryId;
+
+before(async () => {
+  await inquiryModel.deleteMany({});
+});
+
+beforeEach(async () => {
+  const inquiry = await inquiryModel.create(validInquiryData);
+  createdInquiryId = inquiry._id;
+});
+
+afterEach(async () => {
+  await inquiryModel.deleteMany({});
+});
+
+after(async () => {
+  await mongoose.connection.close();
+});
 
 describe('Inquiry controller', function () {
   this.timeout(10000);
@@ -111,6 +113,7 @@ describe('Inquiry controller', function () {
 
     it('should return error 404 if no inquiries found', async () => {
       await inquiryModel.deleteMany({});
+
       const res = await supertest(app)
         .post('/api/inquiry/list-of-inquiry')
         .send(pagination)
@@ -135,12 +138,6 @@ describe('Inquiry controller', function () {
     });
 
     it('should update the inquiry', async () => {
-      const createInquiry = await supertest(app)
-        .post('/api/inquiry/create-inquiry')
-        .send(validInquiryData);
-
-      createdInquiryId = createInquiry.body.data.id;
-
       const res = await supertest(app)
         .put(`/api/inquiry/update-inquiry/${createdInquiryId}`)
         .expect(StatusCodes.OK);
@@ -151,6 +148,12 @@ describe('Inquiry controller', function () {
     });
 
     it('should return 400 if inquiry is already resolved', async () => {
+      await inquiryModel.findByIdAndUpdate(
+        createdInquiryId,
+        { status: 'resolved' },
+        { new: true }
+      );
+
       const res = await supertest(app)
         .put(`/api/inquiry/update-inquiry/${createdInquiryId}`)
         .expect(StatusCodes.OK);
