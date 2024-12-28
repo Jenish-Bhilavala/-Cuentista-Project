@@ -14,6 +14,7 @@ const {
   invalidPhoneInquiryData,
 } = require('../data/inquiryData');
 const app = require('../../../server');
+const { inquiryRoutes } = require('../data/routesData');
 const expect = chai.expect;
 
 let createdInquiryId;
@@ -24,7 +25,7 @@ describe('Inquiry controller', function () {
   describe('createInquiry', () => {
     it('should return validation error if first name is empty', async () => {
       const res = await supertest(app)
-        .post('/api/inquiry/create-inquiry')
+        .post(inquiryRoutes.createInquiry)
         .send(emptyInquiryData)
         .expect(StatusCodes.OK);
 
