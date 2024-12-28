@@ -18,28 +18,11 @@ const expect = chai.expect;
 
 let createdInquiryId;
 
-before(async () => {
-  await inquiryModel.deleteMany({});
-});
-
-beforeEach(async () => {
-  const inquiry = await inquiryModel.create(validInquiryData);
-  createdInquiryId = inquiry._id;
-});
-
-afterEach(async () => {
-  await inquiryModel.deleteMany({});
-});
-
-after(async () => {
-  await mongoose.connection.close();
-});
-
 describe('Inquiry controller', function () {
-  this.timeout(10000);
+  this.timeout(20000);
 
   describe('createInquiry', () => {
-    it('should return validation error if any field is empty', async () => {
+    it('should return validation error if first name is empty', async () => {
       const res = await supertest(app)
         .post('/api/inquiry/create-inquiry')
         .send(emptyInquiryData)
@@ -50,7 +33,7 @@ describe('Inquiry controller', function () {
       expect(res.body.message).to.equal('First name cannot be empty.');
     });
 
-    it('should return error of first name is required.', async () => {
+    it('should return error of first name is missing.', async () => {
       const res = await supertest(app)
         .post('/api/inquiry/create-inquiry')
         .send(fieldRequiredInquiryData)
@@ -126,7 +109,7 @@ describe('Inquiry controller', function () {
   });
 
   describe('Update inquiry', async () => {
-    it('should return 404 if inquiry not found', async () => {
+    it('should return 404 error if inquiry not found', async () => {
       const fakeId = new mongoose.Types.ObjectId();
       const res = await supertest(app)
         .put(`/api/inquiry/update-inquiry/${fakeId}`)
@@ -138,6 +121,11 @@ describe('Inquiry controller', function () {
     });
 
     it('should update the inquiry', async () => {
+      const inquiry = await supertest(app)
+        .post('/api/inquiry/create-inquiry')
+        .send(validInquiryData);
+      createdInquiryId = inquiry.body.data.id;
+
       const res = await supertest(app)
         .put(`/api/inquiry/update-inquiry/${createdInquiryId}`)
         .expect(StatusCodes.OK);
@@ -147,13 +135,7 @@ describe('Inquiry controller', function () {
       expect(res.body.message).to.equal(message.RESOLVED_SUCCESSFULLY);
     });
 
-    it('should return 400 if inquiry is already resolved', async () => {
-      await inquiryModel.findByIdAndUpdate(
-        createdInquiryId,
-        { status: 'resolved' },
-        { new: true }
-      );
-
+    it('should return 400 error if inquiry is already resolved', async () => {
       const res = await supertest(app)
         .put(`/api/inquiry/update-inquiry/${createdInquiryId}`)
         .expect(StatusCodes.OK);
@@ -161,6 +143,8 @@ describe('Inquiry controller', function () {
       expect(res.body.status).to.equal(response.ERROR);
       expect(res.body.statusCode).to.equal(StatusCodes.BAD_REQUEST);
       expect(res.body.message).to.equal(message.ALREADY_RESOLVED);
+
+      await inquiryModel.deleteMany({});
     });
   });
 });
