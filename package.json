@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "commonjs",
   "scripts": {
     "test": "mocha app/Test/controllers/**/*.test.js",
     "test:admin": "mocha app/Test/controllers/adminController.test.js",
