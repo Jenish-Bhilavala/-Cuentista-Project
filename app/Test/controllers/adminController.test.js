@@ -5,26 +5,10 @@ const adminModel = require('../../models/adminModel');
 const { StatusCodes } = require('http-status-codes');
 const app = require('../../../server');
 const expect = chai.expect;
-
-const {
-  validAdminLoginData,
-  invalidAdminLoginData,
-  dummyAdminLoginData,
-  missingEmailData,
-  missingPasswordData,
-  invalidEmailData,
-  invalidPasswordData,
-  wrongEmail,
-  missingNewPassword,
-  wrongEmailChangePW,
-  wrongConfirmPW,
-  ValidChangePasswordData,
-  newPasswordMissingForgotData,
-  EmailNotFoundForgotData,
-  OTPNotFoundForgotData,
-} = require('../data/adminData');
+const adminData = require('../data/adminData');
 const { response } = require('../../utils/enum');
 const message = require('../../utils/message');
+const { adminRoutes } = require('../data/routesData');
 
 let admin;
 let otp;
@@ -45,12 +29,23 @@ after(async () => {
 });
 
 describe('Admin controller', function () {
-  this.timeout(10000);
+  this.timeout(20000);
   describe('admin login', () => {
-    it('should return validation error if email is missing', async () => {
+    it('should return validation error if email is not a string', async () => {
       const res = await supertest(app)
-        .post('/api/admin/login')
-        .send(missingEmailData)
+        .post(adminRoutes.adminLogin)
+        .send(adminData.loginEmailTypeCheck)
+        .expect(StatusCodes.OK);
+
+      expect(res.body.status).to.equal(response.ERROR);
+      expect(res.body.statusCode).to.equal(StatusCodes.BAD_REQUEST);
+      expect(res.body.message).to.equal('Email must be a string.');
+    });
+
+    it('should return validation error if payload is empty', async () => {
+      const res = await supertest(app)
+        .post(adminRoutes.adminLogin)
+        .send(adminData.emptyPayload)
         .expect(StatusCodes.OK);
 
       expect(res.body.status).to.equal(response.ERROR);
@@ -60,8 +55,8 @@ describe('Admin controller', function () {
 
     it('should return validation error if password is missing', async () => {
       const res = await supertest(app)
-        .post('/api/admin/login')
-        .send(missingPasswordData)
+        .post(adminRoutes.adminLogin)
+        .send(adminData.loginMissingPassword)
         .expect(StatusCodes.OK);
 
       expect(res.body.status).to.equal(response.ERROR);
@@ -71,8 +66,8 @@ describe('Admin controller', function () {
 
     it('should return validation error if email is invalid', async () => {
       const res = await supertest(app)
-        .post('/api/admin/login')
-        .send(invalidEmailData)
+        .post(adminRoutes.adminLogin)
+        .send(adminData.loginInvalidEmail)
         .expect(StatusCodes.OK);
 
       expect(res.body.status).to.equal(response.ERROR);
@@ -80,21 +75,10 @@ describe('Admin controller', function () {
       expect(res.body.message).to.equal('Email must be a valid email address.');
     });
 
-    it('should return error if Admin is not found', async () => {
-      const res = await supertest(app)
-        .post('/api/admin/login')
-        .send(dummyAdminLoginData)
-        .expect(StatusCodes.OK);
-
-      expect(res.body.status).to.equal(response.ERROR);
-      expect(res.body.statusCode).to.equal(StatusCodes.NOT_FOUND);
-      expect(res.body.message).to.equal(`Admin profile ${message.NOT_FOUND}`);
-    });
-
     it('should return validation error if password is invalid', async () => {
       const res = await supertest(app)
-        .post('/api/admin/login')
-        .send(invalidPasswordData)
+        .post(adminRoutes.adminLogin)
+        .send(adminData.loginInvalidPassword)
         .expect(StatusCodes.OK);
 
       expect(res.body.status).to.equal(response.ERROR);
@@ -104,19 +88,41 @@ describe('Admin controller', function () {
       );
     });
 
+    it('should return error for email if it is empty string', async () => {
+      const res = await supertest(app)
+        .post(adminRoutes.adminLogin)
+        .send(adminData.loginEmptyEmail)
+        .expect(StatusCodes.OK);
+
+      expect(res.body.status).to.equal(response.ERROR);
+      expect(res.body.statusCode).to.equal(StatusCodes.BAD_REQUEST);
+      expect(res.body.message).to.equal('Email cannot be empty.');
+    });
+
+    it('should return error if Admin is not found', async () => {
+      const res = await supertest(app)
+        .post(adminRoutes.adminLogin)
+        .send(adminData.loginNotFound)
+        .expect(StatusCodes.OK);
+
+      expect(res.body.status).to.equal(response.ERROR);
+      expect(res.body.statusCode).to.equal(StatusCodes.NOT_FOUND);
+      expect(res.body.message).to.equal(`Admin profile ${message.NOT_FOUND}`);
+    });
+
     it('should return error if credential(pw) not match ', async () => {
       const isPasswordValid = await bcrypt.compare(
-        validAdminLoginData.password,
+        adminData.loginCredentialNotMatch.password,
         admin.password
       );
 
-      expect(isPasswordValid).to.be.true;
+      expect(isPasswordValid).to.be.false;
     });
 
     it('should return database error for invalid password', async () => {
       const res = await supertest(app)
-        .post('/api/admin/login')
-        .send(invalidAdminLoginData)
+        .post(adminRoutes.adminLogin)
+        .send(adminData.loginCredentialNotMatch)
         .expect(StatusCodes.OK);
 
       expect(res.body.status).to.equal(response.ERROR);
@@ -126,8 +132,8 @@ describe('Admin controller', function () {
 
     it('should successfully login with valid email and password', async () => {
       const res = await supertest(app)
-        .post('/api/admin/login')
-        .send(validAdminLoginData)
+        .post(adminRoutes.adminLogin)
+        .send(adminData.validAdminLoginData)
         .expect(StatusCodes.OK);
 
       expect(res.body.status).to.equal(response.SUCCESS);
@@ -138,10 +144,32 @@ describe('Admin controller', function () {
   });
 
   describe('Verify Email', () => {
+    it('should return validation error if email is not a string', async () => {
+      const res = await supertest(app)
+        .post(adminRoutes.verifyEmail)
+        .send(adminData.verifyEmailTypeCheck)
+        .expect(StatusCodes.OK);
+
+      expect(res.body.status).to.equal(response.ERROR);
+      expect(res.body.statusCode).to.equal(StatusCodes.BAD_REQUEST);
+      expect(res.body.message).to.equal('Email must be a string.');
+    });
+
+    it('should return validation error if empty payload pass', async () => {
+      const res = await supertest(app)
+        .post(adminRoutes.verifyEmail)
+        .send(adminData.emptyPayload)
+        .expect(StatusCodes.OK);
+
+      expect(res.body.status).to.equal(response.ERROR);
+      expect(res.body.statusCode).to.equal(StatusCodes.BAD_REQUEST);
+      expect(res.body.message).to.equal('Email is a required field.');
+    });
+
     it('should return validation error if email is invalid', async () => {
       const res = await supertest(app)
-        .post('/api/admin/verify-email')
-        .send(invalidEmailData)
+        .post(adminRoutes.verifyEmail)
+        .send(adminData.verifyInvalidEmail)
         .expect(StatusCodes.OK);
 
       expect(res.body.status).to.equal(response.ERROR);
@@ -151,8 +179,8 @@ describe('Admin controller', function () {
 
     it('should return error if email is missing in db', async () => {
       const res = await supertest(app)
-        .post('/api/admin/verify-email')
-        .send(wrongEmail)
+        .post(adminRoutes.verifyEmail)
+        .send(adminData.verifyWrongEmail)
         .expect(StatusCodes.OK);
 
       expect(res.body.status).to.equal(response.ERROR);
@@ -162,8 +190,8 @@ describe('Admin controller', function () {
 
     it('should send OTP successfully', async () => {
       const res = await supertest(app)
-        .post('/api/admin/verify-email')
-        .send(missingPasswordData)
+        .post(adminRoutes.verifyEmail)
+        .send(adminData.verifyValidEmail)
         .expect(StatusCodes.OK);
 
       otp = res.body.data.otp;
@@ -175,10 +203,34 @@ describe('Admin controller', function () {
   });
 
   describe('change password', () => {
+    it('should return validation error for current password is not string', async () => {
+      const res = await supertest(app)
+        .put(adminRoutes.changePassword)
+        .send(adminData.changePasswordTypeCheck)
+        .expect(StatusCodes.OK);
+
+      expect(res.body.status).to.equal(response.ERROR);
+      expect(res.body.statusCode).to.equal(StatusCodes.BAD_REQUEST);
+      expect(res.body.message).to.equal(
+        `\"current_password\" must be a string`
+      );
+    });
+
+    it('should return validation error for empty payload', async () => {
+      const res = await supertest(app)
+        .put(adminRoutes.changePassword)
+        .send(adminData.emptyPayload)
+        .expect(StatusCodes.OK);
+
+      expect(res.body.status).to.equal(response.ERROR);
+      expect(res.body.statusCode).to.equal(StatusCodes.BAD_REQUEST);
+      expect(res.body.message).to.equal('Email is a required field.');
+    });
+
     it('should return validation error for current password is not given', async () => {
       const res = await supertest(app)
         .put('/api/admin/change-password')
-        .send(wrongEmail)
+        .send(adminData.changeFieldRequired)
         .expect(StatusCodes.OK);
 
       expect(res.body.status).to.equal(response.ERROR);
@@ -186,21 +238,34 @@ describe('Admin controller', function () {
       expect(res.body.message).to.equal('Current password must be required.');
     });
 
-    it('should return validation error for new password is not given', async () => {
+    it('should return validation error for new password formate is invalid', async () => {
       const res = await supertest(app)
-        .put('/api/admin/change-password')
-        .send(missingNewPassword)
+        .put(adminRoutes.changePassword)
+        .send(adminData.changePasswordFormate)
         .expect(StatusCodes.OK);
 
       expect(res.body.status).to.equal(response.ERROR);
       expect(res.body.statusCode).to.equal(StatusCodes.BAD_REQUEST);
-      expect(res.body.message).to.equal('New password must be required.');
+      expect(res.body.message).to.equal(
+        'New password must start with a capital latter and must be at least 8 characters long.'
+      );
     });
 
-    it('should return error if email is missing in db', async () => {
+    it('should return validation error if new password is an empty string', async () => {
       const res = await supertest(app)
-        .put('/api/admin/change-password')
-        .send(wrongEmailChangePW)
+        .put(adminRoutes.changePassword)
+        .send(adminData.changeEmptyField)
+        .expect(StatusCodes.OK);
+
+      expect(res.body.status).to.equal(response.ERROR);
+      expect(res.body.statusCode).to.equal(StatusCodes.BAD_REQUEST);
+      expect(res.body.message).to.equal('New password cannot be empty.');
+    });
+
+    it('should return error if email is not found in db', async () => {
+      const res = await supertest(app)
+        .put(adminRoutes.changePassword)
+        .send(adminData.changeFakeData)
         .expect(StatusCodes.OK);
 
       expect(res.body.status).to.equal(response.ERROR);
@@ -210,8 +275,8 @@ describe('Admin controller', function () {
 
     it('should return error if new and confirm pw does not match', async () => {
       const res = await supertest(app)
-        .put('/api/admin/change-password')
-        .send(wrongConfirmPW)
+        .put(adminRoutes.changePassword)
+        .send(adminData.changeDifferentPassword)
         .expect(StatusCodes.OK);
 
       expect(res.body.status).to.equal(response.ERROR);
@@ -220,19 +285,19 @@ describe('Admin controller', function () {
       );
     });
 
-    it('should return error if new password and db password not match', async () => {
+    it('should return error if current password and db password not match', async () => {
       const isPasswordValid = await bcrypt.compare(
-        wrongConfirmPW.confirm_password,
+        adminData.changIsPasswordMatch.current_password,
         admin.password
       );
 
       expect(isPasswordValid).to.be.false;
     });
 
-    it('should change password if all are ok', async () => {
+    it('should change password', async () => {
       const res = await supertest(app)
-        .put('/api/admin/change-password')
-        .send(ValidChangePasswordData)
+        .put(adminRoutes.changePassword)
+        .send(adminData.ValidChangePasswordData)
         .expect(StatusCodes.OK);
 
       expect(res.body.status).to.equal(response.SUCCESS);
@@ -243,20 +308,64 @@ describe('Admin controller', function () {
   });
 
   describe('forgot password', () => {
+    it('should return validation error if email is not a string', async () => {
+      const res = await supertest(app)
+        .put(adminRoutes.forgotPassword)
+        .send(adminData.forgotEmailTypeCheck)
+        .expect(StatusCodes.OK);
+
+      expect(res.body.status).to.equal(response.ERROR);
+      expect(res.body.statusCode).to.equal(StatusCodes.BAD_REQUEST);
+      expect(res.body.message).to.equal('Email must be a string.');
+    });
+
+    it('should return validation error for empty payload', async () => {
+      const res = await supertest(app)
+        .put(adminRoutes.forgotPassword)
+        .send(adminData.emptyPayload)
+        .expect(StatusCodes.OK);
+
+      expect(res.body.status).to.equal(response.ERROR);
+      expect(res.body.statusCode).to.equal(StatusCodes.BAD_REQUEST);
+      expect(res.body.message).to.equal('Email is a required field.');
+    });
+
     it('should return validation error for new password field', async () => {
       const res = await supertest(app)
-        .put('/api/admin/forgot-password')
-        .send(newPasswordMissingForgotData)
+        .put(adminRoutes.forgotPassword)
+        .send(adminData.forgotRequiredField)
         .expect(StatusCodes.OK);
 
       expect(res.body.statusCode).to.equal(StatusCodes.BAD_REQUEST);
       expect(res.body.message).to.equal('New password must be required.');
     });
 
+    it('should return validation error if email is invalid', async () => {
+      const res = await supertest(app)
+        .put(adminRoutes.forgotPassword)
+        .send(adminData.forgotInvalidEmail)
+        .expect(StatusCodes.OK);
+
+      expect(res.body.status).to.equal(response.ERROR);
+      expect(res.body.statusCode).to.equal(StatusCodes.BAD_REQUEST);
+      expect(res.body.message).to.equal('Email must be a valid email address.');
+    });
+
+    it('should return validation error if email is empty string', async () => {
+      const res = await supertest(app)
+        .put(adminRoutes.forgotPassword)
+        .send(adminData.forgotEmptyString)
+        .expect(StatusCodes.OK);
+
+      expect(res.body.status).to.equal(response.ERROR);
+      expect(res.body.statusCode).to.equal(StatusCodes.BAD_REQUEST);
+      expect(res.body.message).to.equal('Email cannot be empty.');
+    });
+
     it('should return error if admin not found', async () => {
       const res = await supertest(app)
-        .put('/api/admin/forgot-password')
-        .send(EmailNotFoundForgotData)
+        .put(adminRoutes.forgotPassword)
+        .send(adminData.forgotEmailNotFound)
         .expect(StatusCodes.OK);
 
       expect(res.body.status).to.equal(response.ERROR);
@@ -266,8 +375,8 @@ describe('Admin controller', function () {
 
     it('should return error if otp not found', async () => {
       const res = await supertest(app)
-        .put('/api/admin/forgot-password')
-        .send(OTPNotFoundForgotData)
+        .put(adminRoutes.forgotPassword)
+        .send(adminData.forgotOTPNotFound)
         .expect(StatusCodes.OK);
 
       expect(res.body.status).to.equal(response.ERROR);
@@ -277,7 +386,7 @@ describe('Admin controller', function () {
 
     it('should update password', async () => {
       const res = await supertest(app)
-        .put('/api/admin/forgot-password')
+        .put(adminRoutes.forgotPassword)
         .send({
           email: 'admin@gmail.com',
           otp,
