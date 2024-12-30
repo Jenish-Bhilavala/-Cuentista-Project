@@ -12,20 +12,20 @@ const { adminRoutes } = require('../data/routesData');
 
 let admin;
 let otp;
-const password = 'Admin@1234';
+const password = adminData.adminLoin.password;
 const hashedPassword = bcrypt.hashSync(password, 10);
 
 before(async () => {
   admin = new adminModel({
-    name: 'Admin',
-    email: 'admin@gmail.com',
+    name: adminData.adminLoin.name,
+    email: adminData.adminLoin.email,
     password: hashedPassword,
   });
   await admin.save();
 });
 
 after(async () => {
-  await adminModel.deleteOne({ email: 'admin@gmail.com' });
+  await adminModel.deleteOne({ email: adminData.adminLoin.email });
 });
 
 describe('Admin controller', function () {
@@ -229,7 +229,7 @@ describe('Admin controller', function () {
 
     it('should return validation error for current password is not given', async () => {
       const res = await supertest(app)
-        .put('/api/admin/change-password')
+        .put(adminRoutes.changePassword)
         .send(adminData.changeFieldRequired)
         .expect(StatusCodes.OK);
 
@@ -388,10 +388,10 @@ describe('Admin controller', function () {
       const res = await supertest(app)
         .put(adminRoutes.forgotPassword)
         .send({
-          email: 'admin@gmail.com',
+          email: adminData.adminLoin.email,
           otp,
-          new_password: 'Admin@1234',
-          confirm_password: 'Admin@1234',
+          new_password: adminData.adminLoin.password,
+          confirm_password: adminData.adminLoin.password,
         })
         .expect(StatusCodes.OK);
 

@@ -155,4 +155,10 @@ module.exports = {
     new_password: 'Admin@1234',
     confirm_password: 'Admin@1234',
   },
+
+  adminLoin: {
+    name: 'Admin',
+    email: 'admin@gmail.com',
+    password: 'Admin@1234',
+  },
 };
