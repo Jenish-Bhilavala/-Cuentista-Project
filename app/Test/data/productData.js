@@ -1,4 +1,7 @@
 module.exports = {
+  // common
+  emptyPayload: {},
+  // add product
   validProductData: {
     product_name: 'Vivo t2 5G',
     product_description: 'A great product for testing purposes.',
@@ -107,5 +110,18 @@ module.exports = {
     ],
     methodology: [{ methodology_steps: 'Step 1' }],
     expertise: [{ area: 'Area 1', description: 'Description 1' }],
+  },
+
+  // listOfProduct
+  pagination: {
+    page: 1,
+    limit: 2,
+    sortBy: 'createdAt',
+    orderBy: 'ASC',
+  },
+
+  // update product
+  updateTypeCheck: {
+    product_name: 132,
   },
 };

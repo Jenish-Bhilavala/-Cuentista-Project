@@ -11,4 +11,12 @@ module.exports = {
     changePassword: '/api/admin/change-password',
     forgotPassword: '/api/admin/forgot-password',
   },
+
+  productRoutes: {
+    addProduct: '/api/product',
+    viewProduct: '/api/product/view-product/:id',
+    getListOfProduct: '/api/product/get-product-list',
+    listOfProduct: '/api/product/list-of-product',
+    updateProduct: '/api/product/update-product/:id',
+  },
 };
