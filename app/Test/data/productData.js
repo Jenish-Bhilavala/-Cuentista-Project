@@ -124,4 +124,8 @@ module.exports = {
   updateTypeCheck: {
     product_name: 132,
   },
+
+  updateData: {
+    product_name: 'Update',
+  },
 };

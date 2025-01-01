@@ -181,6 +181,16 @@ describe('Product Controller', function () {
       expect(res.body.message).to.equal('Product name must be a string.');
     });
 
+    it('should return validation error if field is empty string.', async () => {
+      const res = await supertest(app)
+        .put(productRoutes.updateProduct.replace(':id', productId))
+        .send(productData.emptyNameProductData)
+        .expect(StatusCodes.OK);
+
+      expect(res.body.status).to.equal(response.ERROR);
+      expect(res.body.statusCode).to.equal(StatusCodes.BAD_REQUEST);
+    });
+
     it('should return error if product not found.', async () => {
       const res = await supertest(app)
         .put(productRoutes.updateProduct.replace(':id', fakeId))
@@ -190,6 +200,66 @@ describe('Product Controller', function () {
       expect(res.body.status).to.equal(response.ERROR);
       expect(res.body.statusCode).to.equal(StatusCodes.NOT_FOUND);
       expect(res.body.message).to.equal(`Product ${message.NOT_FOUND}`);
+    });
+
+    it('should update the product', async () => {
+      const res = await supertest(app)
+        .put(productRoutes.updateProduct.replace(':id', productId))
+        .send(productData.updateData)
+        .expect(StatusCodes.OK);
+
+      expect(res.body.status).to.equal(response.SUCCESS);
+      expect(res.body.statusCode).to.equal(StatusCodes.ACCEPTED);
+      expect(res.body.message).to.equal(
+        `Profile ${message.UPDATED_SUCCESSFULLY}`
+      );
+    });
+  });
+
+  describe('update product', () => {
+    it('should return validation error if product name is not string.', async () => {
+      const res = await supertest(app)
+        .put(productRoutes.updateProduct.replace(':id', productId))
+        .send(productData.updateTypeCheck)
+        .expect(StatusCodes.OK);
+
+      expect(res.body.status).to.equal(response.ERROR);
+      expect(res.body.statusCode).to.equal(StatusCodes.BAD_REQUEST);
+      expect(res.body.message).to.equal('Product name must be a string.');
+    });
+
+    it('should return validation error if field is empty string.', async () => {
+      const res = await supertest(app)
+        .put(productRoutes.updateProduct.replace(':id', productId))
+        .send(productData.emptyNameProductData)
+        .expect(StatusCodes.OK);
+
+      expect(res.body.status).to.equal(response.ERROR);
+      expect(res.body.statusCode).to.equal(StatusCodes.BAD_REQUEST);
+    });
+  });
+
+  describe('delete product', () => {
+    it('should return error if product not found.', async () => {
+      const res = await supertest(app)
+        .delete(productRoutes.deleteProduct.replace(':id', fakeId))
+        .expect(StatusCodes.OK);
+
+      expect(res.body.status).to.equal(response.ERROR);
+      expect(res.body.statusCode).to.equal(StatusCodes.NOT_FOUND);
+      expect(res.body.message).to.equal(`Product ${message.NOT_FOUND}`);
+    });
+
+    it('should delete the product', async () => {
+      const res = await supertest(app)
+        .delete(productRoutes.deleteProduct.replace(':id', productId))
+        .expect(StatusCodes.OK);
+
+      expect(res.body.status).to.equal(response.SUCCESS);
+      expect(res.body.statusCode).to.equal(StatusCodes.OK);
+      expect(res.body.message).to.equal(
+        `Product ${message.DELETE_SUCCESSFULLY}`
+      );
     });
   });
 });
