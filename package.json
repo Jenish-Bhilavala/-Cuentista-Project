@@ -8,6 +8,7 @@
     "test": "mocha app/Test/controllers/**/*.test.js",
     "test:admin": "mocha app/Test/controllers/adminController.test.js",
     "test:inquiry": "mocha app/Test/controllers/inquiryController.test.js",
+    "test:product": "mocha app/Test/controllers/productController.test.js",
     "format": "prettier --write ."
   },
   "keywords": [],
