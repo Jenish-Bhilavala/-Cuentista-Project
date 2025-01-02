@@ -112,6 +112,25 @@ module.exports = {
     expertise: [{ area: 'Area 1', description: 'Description 1' }],
   },
 
+  invalidFormateService: {
+    product_name: 'Product A',
+    product_description: 'A great product for testing purposes.',
+    images: {
+      overview_image: 'overview.jpg',
+      service_image: 'service.jpg',
+      right_side_image1: 'right1.jpg',
+      right_side_image2: 'right2.jpg',
+    },
+    contact: '123-456-7890',
+    product_benefit: [{ benefit_description: 'Benefit 1' }],
+    product_service: {
+      service_type: 'Service 1',
+      service_details: [{ service_detail: 'Detail 1' }],
+    },
+    methodology: [{ methodology_steps: 'Step 1' }],
+    expertise: [{ area: 'Area 1', description: 'Description 1' }],
+  },
+
   // listOfProduct
   pagination: {
     page: 1,
